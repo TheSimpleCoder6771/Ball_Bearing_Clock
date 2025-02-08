@@ -117,6 +117,11 @@ const long interval = 20000;
 static unsigned int hours = 0; // Starting hours
 static unsigned int minutes = 0; // Starting minute
 
+static unsigned int minBallReleased = 0;
+static unsigned int hrBallReleased = 0;
+
+static unsigned int state = 1;
+
 // Button debounce variables
 unsigned long lastDebounceTime = 0;
 bool lastButtonState = HIGH;
@@ -124,13 +129,14 @@ bool buttonState = HIGH;
 
 void setup() {
     //Serial.begin(9600);
-    //delay(2000);
+
 
     pinMode(RESET_BUTTON_PIN, INPUT_PULLUP); // Configure reset button pin as input with pullup
 
     // Put servo in starting position
     initServos();
     allBallsRelease();
+    delay(10000);
 }
 
 void loop() {
@@ -138,36 +144,98 @@ void loop() {
     
     if (currentMillis - previousMillis >= interval) {
         previousMillis = currentMillis;
-        incrementTime();
-        //printTime();
+      minutes++;
     }
+    
+    incrementTime();
 
     checkResetButton();
 }
-
+   
 void incrementTime(void) 
 {
-    if (!(minutes > (NO_OF_MIN_BALLS-1)))
-    { 
-        minutes++;
-        launchMinuteBall();
-    } 
-    else 
+switch (state)
+{
+  case 1:
+  {
+    minBallRelease();
+    minBallLift();
+    hrBallRelease();
+    hrBallLift();
+    state = 2;
+  break;
+  }
+  case 2:
+  {
+    if(1 == minutes)
     {
-      if(!(hours > (NO_OF_HR_BALLS-1)))
-      {
-        minutes = 0;
-        hours++;
-        launchHourBall();
-        allMinuteBallsRelease();
-      }
-      else
-      {
-        minutes = 0;
-        hours = 0;
-        allBallsRelease();
-      }
+      minutes = 0;
+      minBallRampRelease();
+      minBallReleased++;
+      state = 3;
     }
+  break;
+  }
+  case 3:
+  {
+    if(minBallReleased >= NO_OF_MIN_BALLS)
+    {
+      state = 4;
+    }
+    else
+    {
+      minBallRelease();
+      minBallLift();
+      state = 2;
+    }
+  break;
+  }
+  case 4:
+  {
+    if(1 == minutes)
+    {
+      minutes = 0;
+      hrBallRampRelease();
+      hrBallReleased++;
+      allMinuteBallsRelease();
+      delay(10000);
+      state = 5;
+    }
+  break;
+  }
+  case 5:
+  {
+    if(hrBallReleased >= NO_OF_HR_BALLS)
+    {
+      state = 6;
+    }
+    else
+    {
+      hrBallRelease();
+      hrBallLift();
+      minBallRelease();
+      minBallLift();
+      state = 2;
+    }
+    break;
+  }
+  case 6:
+  {
+    if(1 == minutes)
+    {
+      minutes = 0;
+      allBallsRelease();
+      delay(10000);
+      state = 1;
+    }
+    break;
+  }
+  default:
+  {
+    // do Nothing
+    break;
+  }
+}
 }
 
 void printTime(void) 
@@ -202,9 +270,9 @@ void initServos(void)
 
 void launchMinuteBall(void) 
 {
+  minBallRampRelease();
   minBallRelease();
   minBallLift();
-  minBallRampRelease();
 }
 
 void minBallRelease(void)
@@ -234,9 +302,9 @@ void minBallRampRelease(void)
 
 void launchHourBall(void) 
 {
+  hrBallRampRelease();
   hrBallRelease();
   hrBallLift();
-  hrBallRampRelease();
 }
 
 void hrBallRelease(void)
