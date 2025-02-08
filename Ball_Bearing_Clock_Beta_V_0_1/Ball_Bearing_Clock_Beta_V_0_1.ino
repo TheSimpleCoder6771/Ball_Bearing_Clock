@@ -180,7 +180,14 @@ switch (state)
   {
     if(minBallReleased >= NO_OF_MIN_BALLS)
     {
-      state = 4;
+      if(hrBallReleased >= NO_OF_HR_BALLS)
+      {
+        state = 7;
+      }
+      else
+      {
+        state = 4;
+      }
     }
     else
     {
@@ -222,12 +229,20 @@ switch (state)
   }
   case 6:
   {
+      minBallRelease();
+      minBallLift();
+      state = 2 ;
+    break;
+  }
+  case 7:
+  {
     if(1 == minutes)
     {
       minutes = 0;
       allBallsRelease();
       delay(10000);
       hrBallReleased = 0;
+      minBallReleased = 0;
       state = 1;
     }
     break;
