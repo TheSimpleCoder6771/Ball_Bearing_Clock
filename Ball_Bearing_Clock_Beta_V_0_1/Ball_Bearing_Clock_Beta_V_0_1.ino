@@ -199,6 +199,7 @@ switch (state)
       hrBallReleased++;
       allMinuteBallsRelease();
       delay(10000);
+      minBallReleased = 0;
       state = 5;
     }
   break;
@@ -211,10 +212,10 @@ switch (state)
     }
     else
     {
-      hrBallRelease();
-      hrBallLift();
       minBallRelease();
       minBallLift();
+      hrBallRelease();
+      hrBallLift();
       state = 2;
     }
     break;
@@ -226,6 +227,7 @@ switch (state)
       minutes = 0;
       allBallsRelease();
       delay(10000);
+      hrBallReleased = 0;
       state = 1;
     }
     break;
