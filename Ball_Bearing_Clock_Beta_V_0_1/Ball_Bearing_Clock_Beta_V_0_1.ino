@@ -36,8 +36,8 @@
 #define RESET_BUTTON_PIN A2 // Define the reset button pin
 #define DEBOUNCE_DELAY 50   // Debounce time in milliseconds
 
-#define NO_OF_HR_BALLS 4
-#define NO_OF_MIN_BALLS 6
+#define NO_OF_HR_BALLS 2
+#define NO_OF_MIN_BALLS 59
 
 typedef enum servoName_T {
     MIN_BALL_RAMP_TOP_SERVO,
@@ -113,13 +113,13 @@ servoCtrl_s servoCtrl[SERVO_MAX] = {
 
 // Time variables
 unsigned long previousMillis = 0;
-const long interval = 20000;
+const long interval = 60000;
 static unsigned int hours = 0; // Starting hours
 static unsigned int minutes = 0; // Starting minute
 
 static unsigned int minBallReleased = 0;
 static unsigned int hrBallReleased = 0;
-
+                              
 static unsigned int state = 1;
 
 // Button debounce variables
@@ -353,7 +353,7 @@ void hrBallRampRelease(void)
 void allMinuteBallsRelease(void) 
 {
     servoCtrl[MIN_BALL_RAMP_BOTTOM_SERVO].servoFp->write(servoCtrl[MIN_BALL_RAMP_BOTTOM_SERVO].endPos);
-    delay(1000);
+    delay(5000);
     servoCtrl[MIN_BALL_RAMP_BOTTOM_SERVO].servoFp->write(servoCtrl[MIN_BALL_RAMP_BOTTOM_SERVO].startPos);
     delay(1000);
 }
@@ -361,7 +361,7 @@ void allMinuteBallsRelease(void)
 void allHourBallsRelease(void) 
 {
     servoCtrl[HR_BALL_RAMP_BOTTOM_SERVO].servoFp->write(servoCtrl[HR_BALL_RAMP_BOTTOM_SERVO].endPos);
-    delay(1000);
+    delay(5000);
     servoCtrl[HR_BALL_RAMP_BOTTOM_SERVO].servoFp->write(servoCtrl[HR_BALL_RAMP_BOTTOM_SERVO].startPos);
     delay(1000);
 }
@@ -384,6 +384,7 @@ void checkResetButton(void)
         if (reading == LOW && buttonState == HIGH) {
             resetClock();
             allBallsRelease();
+            state = 1;
         }
         buttonState = reading;
     }
