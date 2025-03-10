@@ -383,6 +383,8 @@ void checkResetButton(void)
     if ((millis() - lastDebounceTime) > DEBOUNCE_DELAY) {
         if (reading == LOW && buttonState == HIGH) {
             resetClock();
+            minBallRampRelease();
+            hrBallRampRelease();
             allBallsRelease();
             state = 1;
         }
